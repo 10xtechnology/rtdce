@@ -2,7 +2,7 @@ from unittest import TestCase
 from dataclasses import dataclass
 from typing import List, Dict
 
-from src.rtdce.enforce import enforce
+from src.rtdce import enforce
 from src.rtdce.exceptions import NotDataclassException
 
 
