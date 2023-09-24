@@ -1,4 +1,3 @@
-
 class NotDataclassException(Exception):
     pass
 

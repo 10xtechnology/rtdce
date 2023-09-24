@@ -17,17 +17,15 @@ def generic_isinstance(value: Any, field_type: Type) -> bool:
                 key_type, value_type = args
                 for key, dict_value in value.items():
                     if not generic_isinstance(key, key_type):
-                        return False 
+                        return False
                     if not generic_isinstance(dict_value, value_type):
-                        return False 
+                        return False
             elif origin == list:
                 value_type = args[0]
                 for list_value in value:
                     if not generic_isinstance(list_value, value_type):
-                        return False 
+                        return False
     return True
-    
-        
 
 
 def enforce(dc: Type):
@@ -39,8 +37,8 @@ def enforce(dc: Type):
 
     for field in dc_fields:
         value = dc_dict.get(field.name)
-        
-        if not generic_isinstance(value, field.type):
-            raise TypeError(f'"{value}" invalid value for field "{field.name}" of type "{field.type}"')
 
-    
+        if not generic_isinstance(value, field.type):
+            raise TypeError(
+                f'"{value}" invalid value for field "{field.name}" of type "{field.type}"'
+            )
