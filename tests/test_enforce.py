@@ -1,6 +1,6 @@
 from unittest import TestCase
 from dataclasses import dataclass, field
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Literal
 
 from src.rtdce import enforce
 from src.rtdce.exceptions import NotDataclassException
@@ -70,4 +70,18 @@ class TestEnforce(TestCase):
 
         t = Test(test=1)
 
+        self.assertRaises(TypeError, lambda: enforce(t))
+
+    def test_enforce_literal(self):
+        @dataclass
+        class Test:
+            test: Literal["test", "test1"]
+
+        t = Test(test="test")
+        enforce(t)
+
+        t = Test(test="test1")
+        enforce(t)
+
+        t = Test(test="test2")
         self.assertRaises(TypeError, lambda: enforce(t))

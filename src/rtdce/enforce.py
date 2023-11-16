@@ -1,7 +1,11 @@
-from typing import Type, get_origin, get_args, Any, Union
+from typing import Type, get_origin, get_args, Any, Union, Literal
 from dataclasses import is_dataclass, fields, asdict
 
 from .exceptions import NotDataclassException, UnsupportedType
+
+
+def supports_isinstance(origin):
+    return origin not in [Union, Literal]
 
 
 def generic_isinstance(value: Any, field_type: Type) -> bool:
@@ -9,7 +13,7 @@ def generic_isinstance(value: Any, field_type: Type) -> bool:
         return isinstance(value, field_type)
 
     if origin := get_origin(field_type):
-        if origin is not Union and not isinstance(value, origin):
+        if supports_isinstance(origin) and not isinstance(value, origin):
             return False
 
         if args := get_args(field_type):
@@ -28,6 +32,11 @@ def generic_isinstance(value: Any, field_type: Type) -> bool:
             elif origin is Union:
                 for arg in args:
                     if generic_isinstance(value, arg):
+                        return True
+                return False
+            elif origin is Literal:
+                for arg in args:
+                    if value == arg:
                         return True
                 return False
     return True
