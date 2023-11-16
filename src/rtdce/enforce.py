@@ -1,4 +1,4 @@
-from typing import Type, get_origin, get_args, Any
+from typing import Type, get_origin, get_args, Any, Union
 from dataclasses import is_dataclass, fields, asdict
 
 from .exceptions import NotDataclassException, UnsupportedType
@@ -9,22 +9,27 @@ def generic_isinstance(value: Any, field_type: Type) -> bool:
         return isinstance(value, field_type)
 
     if origin := get_origin(field_type):
-        if not isinstance(value, origin):
+        if origin is not Union and not isinstance(value, origin):
             return False
 
         if args := get_args(field_type):
-            if origin == dict:
+            if origin is dict:
                 key_type, value_type = args
                 for key, dict_value in value.items():
                     if not generic_isinstance(key, key_type):
                         return False
                     if not generic_isinstance(dict_value, value_type):
                         return False
-            elif origin == list:
+            elif origin is list:
                 value_type = args[0]
                 for list_value in value:
                     if not generic_isinstance(list_value, value_type):
                         return False
+            elif origin is Union:
+                for arg in args:
+                    if generic_isinstance(value, arg):
+                        return True
+                return False
     return True
 
 

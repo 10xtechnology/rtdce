@@ -1,6 +1,6 @@
 from unittest import TestCase
-from dataclasses import dataclass
-from typing import List, Dict
+from dataclasses import dataclass, field
+from typing import List, Dict, Union, Optional
 
 from src.rtdce import enforce
 from src.rtdce.exceptions import NotDataclassException
@@ -39,4 +39,35 @@ class TestEnforce(TestCase):
             test1: Dict[str, int]
 
         t = Test(test=[True], test1={123: 0.123})
+        self.assertRaises(TypeError, lambda: enforce(t))
+
+    def test_enforce_union(self):
+        @dataclass
+        class Test:
+            test: Union[dict, str]
+
+        t = Test(test="test")
+        enforce(t)
+
+        t = Test(test={})
+        enforce(t)
+
+        t = Test(test=1)
+        self.assertRaises(TypeError, lambda: enforce(t))
+
+    def test_enforce_optional(self):
+        @dataclass
+        class Test:
+            test: Optional[str] = field(default=None)
+
+        t = Test()
+
+        enforce(t)
+
+        t = Test(test="test")
+
+        enforce(t)
+
+        t = Test(test=1)
+
         self.assertRaises(TypeError, lambda: enforce(t))
